@@ -7,14 +7,14 @@ use CarBundle\Entity\Make;
 use CarBundle\Entity\Model;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 
 class LoadDictionary extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
      * @param ObjectManager $manager
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $make = new Make();
         $make->setName('VW');
@@ -48,7 +48,7 @@ class LoadDictionary extends AbstractFixture implements OrderedFixtureInterface
     /**
      * @return integer
      */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 1;
     }

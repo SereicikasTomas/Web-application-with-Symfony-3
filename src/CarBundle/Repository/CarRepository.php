@@ -10,12 +10,23 @@ namespace CarBundle\Repository;
  */
 class CarRepository extends \Doctrine\ORM\EntityRepository
 {
-    public function findCarsWithDetails()
+    /**
+     * @param string|null $searchTerm
+     *
+     * @return array
+     */
+    public function findCarsWithDetails($searchTerm = null)
     {
         $qb = $this->createQueryBuilder('c');
         $qb->select('c, make, model');
         $qb->join('c.make', 'make');
         $qb->join('c.model', 'model');
+
+        if ($searchTerm !== null && $searchTerm !== '') {
+            $qb->andWhere('make.name LIKE :term OR model.name LIKE :term');
+            $qb->setParameter('term', '%'.$searchTerm.'%');
+        }
+
         return $qb->getQuery()->getResult();
     }
 
@@ -27,7 +38,8 @@ class CarRepository extends \Doctrine\ORM\EntityRepository
         $qb->join('c.model', 'model');
         $qb->where('c.id = :id');
         $qb->setParameter('id', $id);
-        return $qb->getQuery()->getSingleResult();
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 
 }

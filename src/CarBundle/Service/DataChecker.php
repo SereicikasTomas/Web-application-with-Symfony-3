@@ -4,7 +4,7 @@
 namespace CarBundle\Service;
 
 use CarBundle\Entity\Car;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 
 
 class DataChecker
@@ -13,15 +13,15 @@ class DataChecker
     /** @var boolean */
     protected $requireImagesToPromoteCar;
     
-    /** @var EntityManager */
+    /** @var EntityManagerInterface */
     protected $entityManager;
     /**
      * DataChecker constructor.
      * 
-     * @param EntityManager $entityManager
+     * @param EntityManagerInterface $entityManager
      * @param bool $requireImagesToPromoteCar
      */
-    public function __construct($entityManager,$requireImagesToPromoteCar)
+    public function __construct(EntityManagerInterface $entityManager, $requireImagesToPromoteCar)
     {
         $this->entityManager = $entityManager;
         $this->requireImagesToPromoteCar = $requireImagesToPromoteCar;
@@ -29,15 +29,15 @@ class DataChecker
 
     public function checkCar(Car $car)
     {
-        $promote =  true;
-        if($this->requireImagesToPromoteCar){
-            
-            $promote =  false;
-        } 
+        $promote = true;
+        if ($this->requireImagesToPromoteCar) {
+            $promote = false;
+        }
 
         $car->setPromote($promote);
         $this->entityManager->persist($car);
         $this->entityManager->flush();
+
         return $promote;
     }
 }

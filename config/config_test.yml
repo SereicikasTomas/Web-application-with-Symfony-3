@@ -7,10 +7,10 @@ framework:
         storage_id: session.storage.mock_file
     profiler:
         collect: false
+        collect_serializer_data: true
+    mailer:
+        dsn: 'null://null'
 
 web_profiler:
     toolbar: false
     intercept_redirects: false
-
-swiftmailer:
-    disable_delivery: true

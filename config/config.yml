@@ -2,7 +2,6 @@ imports:
     - { resource: parameters.yml }
     - { resource: security.yml }
     - { resource: services.yml }
-    - { resource: "@CarBundle/Resources/config/services.yml" }
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
@@ -10,27 +9,33 @@ parameters:
     locale: en
 
 framework:
-    templating:
-        engines: ['twig']
     #esi: ~
     #translator: { fallbacks: ['%locale%'] }
     secret: '%secret%'
     router:
-        resource: '%kernel.project_dir%/app/config/routing.yml'
+        resource: '%kernel.project_dir%/config/routing.yml'
         strict_requirements: ~
     form: ~
     csrf_protection: ~
-    validation: { enable_annotations: true }
-    #serializer: { enable_annotations: true }
+    validation:
+        enable_attributes: true
+        email_validation_mode: html5
     default_locale: '%locale%'
+    handle_all_throwables: true
     trusted_hosts: ~
     session:
         # https://symfony.com/doc/current/reference/configuration/framework.html#handler-id
         handler_id: session.handler.native_file
         save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'
+        cookie_secure: auto
+        cookie_samesite: lax
     fragments: ~
     http_method_override: true
     assets: ~
+    property_info:
+        with_constructor_extractor: false
+    mailer:
+        dsn: '%mailer_dsn%'
     php_errors:
         log: true
 
@@ -61,12 +66,11 @@ doctrine:
     orm:
         auto_generate_proxy_classes: '%kernel.debug%'
         naming_strategy: doctrine.orm.naming_strategy.underscore
-        auto_mapping: true
-
-# Swiftmailer Configuration
-swiftmailer:
-    transport: '%mailer_transport%'
-    host: '%mailer_host%'
-    username: '%mailer_user%'
-    password: '%mailer_password%'
-    spool: { type: memory }
+        auto_mapping: false
+        mappings:
+            CarBundle:
+                is_bundle: false
+                type: attribute
+                dir: '%kernel.project_dir%/src/CarBundle/Entity'
+                prefix: 'CarBundle\Entity'
+                alias: CarBundle

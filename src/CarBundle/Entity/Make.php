@@ -4,35 +4,28 @@ namespace CarBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Make
- *
- * @ORM\Table(name="make")
- * @ORM\Entity(repositoryClass="CarBundle\Repository\MakeRepository")
- */
+#[ORM\Table(name: 'make')]
+#[ORM\Entity(repositoryClass: 'CarBundle\Repository\MakeRepository')]
 class Make
 {
     /**
      * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255)
      */
+    #[ORM\Column(name: 'name', type: 'string', length: 255)]
     private $name;
 
     /**
      * @var ArrayCollection
-     *
-     * @ORM\OneToMany(targetEntity="CarBundle\Entity\Car", mappedBy="make")
      */
+    #[ORM\OneToMany(targetEntity: Car::class, mappedBy: 'make')]
     private $cars;
 
     /**

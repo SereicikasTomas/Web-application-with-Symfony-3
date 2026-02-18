@@ -4,70 +4,58 @@ namespace CarBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Car
- *
- * @ORM\Table(name="car")
- * @ORM\Entity(repositoryClass="CarBundle\Repository\CarRepository")
- */
+#[ORM\Table(name: 'car')]
+#[ORM\Entity(repositoryClass: 'CarBundle\Repository\CarRepository')]
 class Car
 {
     /**
      * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var Model
-     *
-     * @ORM\ManyToOne(targetEntity="CarBundle\Entity\Model", inversedBy="cars")
      */
+    #[ORM\ManyToOne(targetEntity: Model::class, inversedBy: 'cars')]
     private $model;
 
     /**
      * @var Make
-     *
-     * @ORM\ManyToOne(targetEntity="CarBundle\Entity\Make", inversedBy="cars")
      */
+    #[ORM\ManyToOne(targetEntity: Make::class, inversedBy: 'cars')]
     private $make;
 
     /**
      * @var float
-     *
-     * @ORM\Column(name="price", type="decimal", scale=2)
      */
+    #[ORM\Column(name: 'price', type: 'decimal', scale: 2)]
     private $price;
 
     /**
      * @var int
-     * 
-     * @ORM\Column(name="year", type="integer")
      */
+    #[ORM\Column(name: 'year', type: 'integer')]
     private $year;
 
     /**
      * @var boolean
-     * 
-     * @ORM\Column(name="navigation", type="boolean")
      */
+    #[ORM\Column(name: 'navigation', type: 'boolean')]
     private $navigation;
 
     /**
      * @var boolean
-     * 
-     * @ORM\Column(name="promote", type="boolean")
      */
+    #[ORM\Column(name: 'promote', type: 'boolean')]
     private $promote;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="description", type="text", nullable=true)
      */
+    #[ORM\Column(name: 'description', type: 'text', nullable: true)]
     private $description;
 
 
@@ -201,7 +189,7 @@ class Car
      *
      * @return Car
      */
-    public function setModel(\CarBundle\Entity\Model $model = null)
+    public function setModel(?Model $model = null)
     {
         $this->model = $model;
 

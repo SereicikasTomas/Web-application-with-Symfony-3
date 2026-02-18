@@ -4,145 +4,133 @@ namespace CarBundle\Controller;
 
 use CarBundle\Entity\Car;
 use CarBundle\Form\CarType;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use CarBundle\Service\DataChecker;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-
-/**
- * Car controller.
- *
- * @Route("/admin/car")
- */
-class CarController extends Controller
+class CarController extends AbstractController
 {
     /**
      * Lists all car entities.
-     *
-     * @Route("/", name="car_index")
-     * @Method("GET")
-     * @Template()
      */
-    public function indexAction()
+    public function indexAction(ManagerRegistry $doctrine)
     {
-        $em = $this->getDoctrine()->getManager();
+        $cars = $doctrine->getRepository(Car::class)->findAll();
 
-        $cars = $em->getRepository('CarBundle:Car')->findAll();
-
-        return array(
+        return $this->render('car/admin/index.html.twig', [
             'cars' => $cars,
-        );
+        ]);
     }
 
     /**
-     * @param $id
      * Promote a car
-     * @Route("/promote/{id}", name="car_promote")
+     *
+     * @param int $id
+     *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function promoteAction($id)
+    public function promoteAction(int $id, DataChecker $dataChecker, ManagerRegistry $doctrine)
     {
+        $car = $doctrine->getRepository(Car::class)->find($id);
 
-        $dataChecker = $this->get('car.data_checker');
-        $em = $this->getDoctrine()->getManager();
-        $car = $em->getRepository('CarBundle:Car')->find($id);
+        if (!$car) {
+            throw $this->createNotFoundException('Car not found.');
+        }
+
         $result = $dataChecker->checkCar($car);
-        if($result){
+        if ($result) {
             $this->addFlash('success', 'Car promoted');
         } else {
             $this->addFlash('warning', 'Car not applicable');
         }
-        return $this->redirectToRoute("car_index");
 
+        return $this->redirectToRoute('car_index');
     }
 
     /**
      * Creates a new car entity.
-     *
-     * @Route("/new", name="car_new")
-     * @Method({"GET", "POST"})
-     * @Template()
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request, EntityManagerInterface $entityManager)
     {
         $car = new Car();
-        $form = $this->createForm('CarBundle\Form\CarType', $car);
+        $form = $this->createForm(CarType::class, $car);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($car);
-            $em->flush();
+            $entityManager->persist($car);
+            $entityManager->flush();
 
-            return $this->redirectToRoute('car_show', array('id' => $car->getId()));
+            return $this->redirectToRoute('car_show', ['id' => $car->getId()]);
         }
 
-        return array(
+        return $this->render('car/admin/new.html.twig', [
             'car' => $car,
             'form' => $form->createView(),
-        );
+        ]);
     }
 
     /**
      * Finds and displays a car entity.
-     *
-     * @Route("/{id}", name="car_show")
-     * @Method("GET")
-     * @Template()
      */
-    public function showAction(Car $car)
+    public function showAction(int $id, ManagerRegistry $doctrine)
     {
+        $car = $this->findCarOr404($id, $doctrine);
         $deleteForm = $this->createDeleteForm($car);
 
-        return array(
+        return $this->render('car/admin/show.html.twig', [
             'car' => $car,
             'delete_form' => $deleteForm->createView(),
-        );
+        ]);
     }
 
     /**
      * Displays a form to edit an existing car entity.
-     *
-     * @Route("/{id}/edit", name="car_edit")
-     * @Method({"GET", "POST"})
-     * @Template()
      */
-    public function editAction(Request $request, Car $car)
+    public function editAction(
+        Request $request,
+        int $id,
+        ManagerRegistry $doctrine,
+        EntityManagerInterface $entityManager
+    )
     {
+        $car = $this->findCarOr404($id, $doctrine);
         $deleteForm = $this->createDeleteForm($car);
-        $editForm = $this->createForm('CarBundle\Form\CarType', $car);
+        $editForm = $this->createForm(CarType::class, $car);
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->flush();
 
-            return $this->redirectToRoute('car_edit', array('id' => $car->getId()));
+            return $this->redirectToRoute('car_edit', ['id' => $car->getId()]);
         }
 
-        return array(
+        return $this->render('car/admin/edit.html.twig', [
             'car' => $car,
             'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
-        );
+        ]);
     }
 
     /**
      * Deletes a car entity.
-     *
-     * @Route("/{id}", name="car_delete")
-     * @Method("DELETE")
      */
-    public function deleteAction(Request $request, Car $car)
+    public function deleteAction(
+        Request $request,
+        int $id,
+        ManagerRegistry $doctrine,
+        EntityManagerInterface $entityManager
+    )
     {
+        $car = $this->findCarOr404($id, $doctrine);
         $form = $this->createDeleteForm($car);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->remove($car);
-            $em->flush();
+            $entityManager->remove($car);
+            $entityManager->flush();
         }
 
         return $this->redirectToRoute('car_index');
@@ -155,12 +143,27 @@ class CarController extends Controller
      *
      * @return \Symfony\Component\Form\Form The form
      */
-    private function createDeleteForm(Car $car)
+    private function createDeleteForm(Car $car): FormInterface
     {
         return $this->createFormBuilder()
-            ->setAction($this->generateUrl('car_delete', array('id' => $car->getId())))
+            ->setAction($this->generateUrl('car_delete', ['id' => $car->getId()]))
             ->setMethod('DELETE')
-            ->getForm()
-        ;
+            ->getForm();
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return Car
+     */
+    private function findCarOr404(int $id, ManagerRegistry $doctrine): Car
+    {
+        $car = $doctrine->getRepository(Car::class)->find($id);
+
+        if (!$car) {
+            throw $this->createNotFoundException('Car not found.');
+        }
+
+        return $car;
     }
 }

@@ -6,14 +6,14 @@ namespace CarBundle\DataFixtures\ORM;
 use CarBundle\Entity\Car;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 
 class LoadCars extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
      * @param ObjectManager $manager
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $car1 = new Car();
         $car1->setModel($this->getReference("X1"));
@@ -37,7 +37,7 @@ class LoadCars extends AbstractFixture implements OrderedFixtureInterface
     /**
      * @return integer
      */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 2;
     }

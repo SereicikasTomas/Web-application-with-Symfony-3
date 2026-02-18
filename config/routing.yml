@@ -1,0 +1,52 @@
+homepage:
+    path: /
+    defaults:
+        _controller: 'AppBundle\Controller\DefaultController::indexAction'
+
+offer:
+    path: /our-cars
+    defaults:
+        _controller: 'CarBundle\Controller\DefaultController::indexAction'
+    methods: [GET]
+
+show_car:
+    path: /car/{id}
+    defaults:
+        _controller: 'CarBundle\Controller\DefaultController::showAction'
+    methods: [GET]
+
+car_index:
+    path: /admin/car/
+    defaults:
+        _controller: 'CarBundle\Controller\CarController::indexAction'
+    methods: [GET]
+
+car_promote:
+    path: /admin/car/promote/{id}
+    defaults:
+        _controller: 'CarBundle\Controller\CarController::promoteAction'
+    methods: [GET]
+
+car_new:
+    path: /admin/car/new
+    defaults:
+        _controller: 'CarBundle\Controller\CarController::newAction'
+    methods: [GET, POST]
+
+car_edit:
+    path: /admin/car/{id}/edit
+    defaults:
+        _controller: 'CarBundle\Controller\CarController::editAction'
+    methods: [GET, POST]
+
+car_delete:
+    path: /admin/car/{id}
+    defaults:
+        _controller: 'CarBundle\Controller\CarController::deleteAction'
+    methods: [DELETE]
+
+car_show:
+    path: /admin/car/{id}
+    defaults:
+        _controller: 'CarBundle\Controller\CarController::showAction'
+    methods: [GET]
