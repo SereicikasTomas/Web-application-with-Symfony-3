@@ -1,1 +1,1 @@
-This is a Back-End project for web application that can be used for car dealer websites. I created this while back using PHP framework Symfony 3.
+This is a Back-End project for web application that can be used for car dealer websites. 
